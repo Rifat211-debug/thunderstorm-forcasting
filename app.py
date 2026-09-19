@@ -1,7 +1,9 @@
+import joblib
 import streamlit as st
-import requests
+import pandas as pd
 
-API_URL = "http://localhost:8000/predict"
+MODEL_PATH = "model/DecisionTreeClassifier_best_model.pkl"
+model = joblib.load(MODEL_PATH)
 
 st.title("🌦 Weather Thinderstorm Prediction App")
 st.write("Enter atmospheric parameters to predict Thunderstorm 🌩️")
@@ -18,28 +20,24 @@ Moisture_Temperature_Profiles = st.number_input("Moisture Temperature Profiles")
 
 
 if st.button("Predict"):
-    payload = {
-        "SWEAT_index": SWEAT_index,
-        "K_index": K_index,
-        "Totals_totals_index": Totals_totals_index,
+    input_df = pd.DataFrame([{
+        "SWEAT index": SWEAT_index,
+        "K index": K_index,
+        "Totals totals index": Totals_totals_index,
         "Environmental_Stability": Environmental_Stability,
         "Moisture_Indices": Moisture_Indices,
         "Convective_Potential": Convective_Potential,
         "Temperature_Pressure": Temperature_Pressure,
-        "Moisture_Temperature_Profiles": Moisture_Temperature_Profiles,
-    }
+        "Moisture_Temperature_Profiles": Moisture_Temperature_Profiles
+    }])
 
-    response = requests.post(API_URL, json = payload)
+    prediction = model.predict(input_df)[0]
+    probability = model.predict_proba(input_df)[0][1]
 
-    if response.status_code == 200:
-        result = response.json()
-
-        if result['prediction'] == 1:
-            st.success(f"Prediction : YES ⚡")
-        else:
-            st.success(f"Prediction : NO 😊")   
-        st.info(f"Probabity : {result['prediction_probability']}")
+    if prediction == 1:
+        st.success(f"Prediction : YES ⚡")
     else:
-        st.error("FastAPI Error! Check fastapi backend!")
+        st.success(f"Prediction : NO 😊")   
+    st.info(f"Probabity : {probability}")
        
 

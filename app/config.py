@@ -1,1 +1,1 @@
-MODEL_PATH = "../model/DecisionTreeClassifier_best_model.pkl"
+MODEL_PATH = "model/DecisionTreeClassifier_best_model.pkl"
